@@ -21,5 +21,9 @@ async def get_dish(category: str):
     return result
 
 
+async def add_dish(dish: Dish):
+    await dish.create()
+
+
 if __name__ == "__main__":
     asyncio.run(connect())

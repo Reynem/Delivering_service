@@ -1,9 +1,9 @@
-from beanie import Document
+from beanie import Document, Indexed
 
 
 class Dish(Document):
     name: str
-    price: float
+    price: Indexed(float)
     category: str
 
     class Settings:
