@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Крутой Ресторан</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #007BFF;
+        }
+        .menu {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .dish {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 10px;
+            width: 200px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Добро пожаловать в Крутой Ресторан</h1>
+        <p>Наш ресторан предлагает лучшие блюда в городе. Мы используем только свежие ингредиенты и готовим с любовью!</p>
+
+        <h2>Наше меню</h2>
+        <div class="menu" id="menu">
+            <!-- Блюда будут добавлены здесь через JS -->
+        </div>
+    </div>
+
+    <script>
+        async function fetchDishes() {
+            try {
+                const response = await fetch("http://localhost:8000/dishes");
+                if (!response.ok) {
+                    throw new Error("Ошибка загрузки данных");
+                }
+                const dishes = await response.json();
+                renderDishes(dishes);
+            } catch (error) {
+                console.error("Ошибка при загрузке блюд:", error);
+            }
+        }
+
+        function renderDishes(dishes) {
+            const menuContainer = document.getElementById("menu");
+            menuContainer.innerHTML = "";
+
+            dishes.forEach(dish => {
+                const dishElement = document.createElement("div");
+                dishElement.classList.add("dish");
+                dishElement.innerHTML = `<h3>${dish.name}</h3><p>${dish.category}</p><p>${dish.price} руб.</p>`;
+                menuContainer.appendChild(dishElement);
+            });
+        }
+
+        fetchDishes();
+
+    </script>
+</body>
+</html>

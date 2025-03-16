@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+
 from database import (get_dish, get_dishes, connect, add_dish, delete_dish,
                       change_name_dish, change_price_dish, change_category_dish)
 from models import Dish
@@ -6,6 +7,7 @@ import uvicorn
 from contextlib import asynccontextmanager
 from models import DishUpdateRequest
 from metadata import tags_metadata
+from fastapi.middleware.cors import CORSMiddleware
 
 
 @asynccontextmanager
@@ -15,6 +17,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan, openapi_tags=tags_metadata)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/dishes", tags=["dishes"], summary="Get all dishes")
