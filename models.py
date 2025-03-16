@@ -1,4 +1,5 @@
 from beanie import Document, Indexed
+from pydantic import BaseModel
 
 
 class Dish(Document):
@@ -9,4 +10,9 @@ class Dish(Document):
     class Settings:
         name = "dishes"
 
+
+class DishUpdateRequest(BaseModel):
+    old_value: str | float
+    new_value: str | float
+    field: str  # "name", "price", "category"
 
