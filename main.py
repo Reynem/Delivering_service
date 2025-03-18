@@ -18,7 +18,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan, openapi_tags=tags_metadata)
 app.add_middleware(
-    CORSMiddleware,
+    CORSMiddleware,  # type: ignore
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
@@ -80,4 +80,4 @@ async def change_dish_api(old_category: str, category: str):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app="main:app", reload=True, port=8080)
+    uvicorn.run(app="main:app", reload=True, port=8000)
