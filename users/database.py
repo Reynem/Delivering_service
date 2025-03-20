@@ -3,7 +3,7 @@ import asyncio
 from beanie import init_beanie
 from models import User, UserCreate
 from fastapi import HTTPException
-from users.encryption import hash_password
+from users.encryption import hash_password, verify_password
 
 
 async def connect():
@@ -13,9 +13,11 @@ async def connect():
 
 
 async def login_user(email: str, password: str):
-    password_hash = hash_password(password)
-    user = await User.find_one(User.email == email, User.password_hash == password_hash)
-    return user
+    user = await User.find_one(User.email == email)
+    if user and verify_password(password, user.password_hash):
+        return user
+    return None
+
 
 
 async def register_user(user: UserCreate):
