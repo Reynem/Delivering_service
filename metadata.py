@@ -7,5 +7,9 @@ tags_metadata = [
         "name": "legacy",
         "description": "Legacy methods that will no longer be used",
     },
+    {
+        "name": "users",
+        "description": "Methods for managing users in the restaurant"
+    }
 
 ]

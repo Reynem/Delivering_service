@@ -7,12 +7,11 @@ from models import Dish
 async def connect():
     client = AsyncIOMotorClient("mongodb://localhost:27017")
 
-    await init_beanie(database=client["dishesDB"], document_models=[Dish])
+    return client["dishesDB"]
 
 
 async def get_dishes():
     result = await Dish.find({}).to_list()
-    print(result)
     return result
 
 
