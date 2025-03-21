@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход - Gourmet House</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="brand">Gourmet House</div>
+        <nav class="auth-links">
+            <a href="index.html" class="btn-link">Главная</a>
+            <a href="register.html" class="btn-primary">Регистрация</a>
+        </nav>
+    </header>
+
+    <main class="auth-container">
+        <div class="auth-card">
+            <h2 class="auth-title">Добро пожаловать</h2>
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <input type="email" id="email" required>
+                    <label>Email</label>
+                    <span class="input-icon">✉️</span>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" required>
+                    <label>Пароль</label>
+                    <span class="input-icon">🔒</span>
+                </div>
+                <button type="submit" class="btn-primary full-width">Войти</button>
+                <div class="auth-links-bottom">
+                    <a href="register.html">Нет аккаунта? Зарегистрируйтесь</a>
+                    <a href="#forgot-password">Забыли пароль?</a>
+                </div>
+            </form>
+            <div id="errorMessage" class="error-message"></div>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+</body>
+</html>

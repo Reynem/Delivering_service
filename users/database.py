@@ -19,7 +19,6 @@ async def login_user(email: str, password: str):
     return None
 
 
-
 async def register_user(user: UserCreate):
     db_user = await User.find_one(User.email == user.email)
     password_hash = hash_password(password=user.password)

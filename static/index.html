@@ -1,81 +1,71 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Крутой Ресторан</title>
-    <style>
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 80%;
-            margin: auto;
-            padding: 20px;
-        }
-        h1 {
-            color: #007BFF;
-        }
-        .menu {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-        }
-        .dish {
-            background: #1e1e1e;
-            padding: 15px;
-            border-radius: 10px;
-            width: 200px;
-            text-align: center;
-            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
-        }
-    </style>
+    <title>Gourmet House | Премиум ресторан</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>Добро пожаловать в Крутой Ресторан</h1>
-        <p>Наш ресторан предлагает лучшие блюда в городе. Мы используем только свежие ингредиенты и готовим с любовью!</p>
+    <header class="main-header">
+        <nav class="navbar">
+            <div class="brand">Gourmet House</div>
+            <div class="auth-links">
+                <a href="login.html" class="btn-link">Вход</a>
+                <a href="register.html" class="btn-primary">Регистрация</a>
+            </div>
+        </nav>
 
-        <h2>Наше меню</h2>
-        <div class="menu" id="menu">
+        <div class="hero">
+            <div class="hero-content">
+                <h1>Искусство настоящей кухни</h1>
+                <p>Премиум ingredients • Шеф-повар с мишленовским опытом • Авторские рецепты</p>
+            </div>
+        </div>
+    </header>
+
+    <section class="features">
+        <div class="feature-card">
+            <div class="feature-icon">🍳</div>
+            <h3>Свежие продукты</h3>
+            <p>Ежедневно отбираем лучшие ingredients у проверенных поставщиков</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">👨🍳</div>
+            <h3>Команда шефов</h3>
+            <p>Наши повара - победители международных кулинарных конкурсов</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🎖</div>
+            <h3>Премиум сервис</h3>
+            <p>Персональный подход к каждому гостю и внимание к деталям</p>
+        </div>
+    </section>
+
+    <main class="container">
+        <h2 class="section-title">Наше меню</h2>
+        <div class="menu-grid" id="menu">
             <!-- Блюда будут добавлены здесь через JS -->
         </div>
-    </div>
+    </main>
 
-    <script>
-        async function fetchDishes() {
-            try {
-                const response = await fetch("http://localhost:8000/dishes");
-                if (!response.ok) {
-                    throw new Error("Ошибка загрузки данных");
-                }
-                const dishes = await response.json();
-                renderDishes(dishes);
-            } catch (error) {
-                console.error("Ошибка при загрузке блюд:", error);
-            }
-        }
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Контакты</h4>
+                <p>Москва, ул. Гастрономическая, 15</p>
+                <p>+7 (495) 123-45-67</p>
+            </div>
+            <div class="footer-section">
+                <h4>Часы работы</h4>
+                <p>Пн-Пт: 12:00 - 23:00</p>
+                <p>Сб-Вс: 11:00 - 00:00</p>
+            </div>
+        </div>
+    </footer>
 
-        function renderDishes(dishes) {
-            const menuContainer = document.getElementById("menu");
-            menuContainer.innerHTML = "";
-
-            dishes.forEach(dish => {
-                const dishElement = document.createElement("div");
-                dishElement.classList.add("dish");
-                dishElement.innerHTML = `<h3>${dish.name}</h3><p>${dish.category}</p><p>${dish.price} руб.</p>`;
-                menuContainer.appendChild(dishElement);
-            });
-        }
-
-        fetchDishes();
-
-    </script>
+    <script src="main.js"></script>
 </body>
 </html>
