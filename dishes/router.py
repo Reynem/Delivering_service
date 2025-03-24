@@ -8,7 +8,7 @@ from models import DishUpdateRequest
 router = APIRouter()
 
 
-@router.get("/dishes", tags=["dishes"], summary="Get all dishes")
+@router.get("/dishes/", tags=["dishes"], summary="Get all dishes")
 async def get_dishes_api():
     results = await get_dishes()
     return results

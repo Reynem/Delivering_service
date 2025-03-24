@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 
 import dishes.router
 import users.router
@@ -29,6 +31,27 @@ app.add_middleware(
 
 app.include_router(router=dishes.router.router)
 app.include_router(router=users.router.router)
+
+
+@app.get("/", response_class=HTMLResponse)
+async def read_root():
+    with open("static/index.html", "r", encoding="utf-8") as f:
+        return f.read()
+
+
+@app.get("/login", response_class=HTMLResponse)
+async def read_root():
+    with open("static/login.html", "r", encoding="utf-8") as f:
+        return f.read()
+
+
+@app.get("/register", response_class=HTMLResponse)
+async def read_root():
+    with open("static/register.html", "r", encoding="utf-8") as f:
+        return f.read()
+
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 if __name__ == "__main__":
     uvicorn.run(app="main:app", reload=True, port=8000)

@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
@@ -18,11 +17,21 @@ async function handleLogin(e) {
     const password = document.getElementById('password').value;
 
     try {
-        const response = await fetch(`http://localhost:8000/user/login/${encodeURIComponent(email)}/${encodeURIComponent(password)}`);
+        const response = await fetch('http://localhost:8000/login/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        });
+
         const data = await response.json();
 
-        if (response.status === 200) {
-            window.location.href = 'index.html';
+        if (response.ok) {
+            window.location.href = '/';
         } else {
             showError(data.detail || 'Ошибка входа');
         }
@@ -37,7 +46,7 @@ async function handleRegister(e) {
     const password = document.getElementById('password').value;
 
     try {
-        const response = await fetch('http://localhost:8000/user/register/', {
+        const response = await fetch('http://localhost:8000/register/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -51,7 +60,7 @@ async function handleRegister(e) {
         const data = await response.json();
 
         if (response.ok) {
-            window.location.href = 'login.html';
+            window.location.href = 'login';
         } else {
             showError(data.detail || 'Ошибка регистрации');
         }
