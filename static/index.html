@@ -13,8 +13,10 @@
         <nav class="navbar">
             <div class="brand">Gourmet House</div>
             <div class="auth-links">
-                <a href="login" class="btn-link">Вход</a>
-                <a href="register" class="btn-primary">Регистрация</a>
+                <a href="login" class="btn-link" id="loginLink">Вход</a>
+                <a href="register" class="btn-primary" id="registerLink">Регистрация</a>
+                <a href="/cabinet" class="btn-primary"  id="cabinetLink" style="display: none;">Личный кабинет</a>
+                <button id="logoutButton" style="display: none;">Выйти</button>
             </div>
         </nav>
 
@@ -66,6 +68,33 @@
         </div>
     </footer>
 
-    <script src="static/main.js"></script>
+    <script src="static/main.js">
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        const token = localStorage.getItem('token');
+        const loginLink = document.getElementById('loginLink');
+        const registerLink = document.getElementById('registerLink');
+        const cabinetLink = document.getElementById('cabinetLink');
+        const logoutButton = document.getElementById('logoutButton');
+
+        if (token) {
+            loginLink.style.display = 'none';
+            registerLink.style.display = 'none';
+            cabinetLink.style.display = 'inline-block';
+            logoutButton.style.display = 'inline-block';
+        } else {
+            cabinetLink.style.display = 'none';
+            logoutButton.style.display = 'none';
+            loginLink.style.display = 'inline-block';
+            registerLink.style.display = 'inline-block';
+        }
+
+        logoutButton.addEventListener('click', function() {
+            localStorage.removeItem('token');
+            window.location.reload();
+        });
+    });
+    </script>
 </body>
 </html>

@@ -31,7 +31,9 @@ async function handleLogin(e) {
         const data = await response.json();
 
         if (response.ok) {
-            window.location.href = '/';
+            console.log("Response data:", data.access_token);
+            localStorage.setItem('token', data.access_token);
+            window.location.href = '/cabinet';
         } else {
             showError(data.detail || 'Ошибка входа');
         }

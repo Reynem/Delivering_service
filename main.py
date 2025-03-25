@@ -51,6 +51,12 @@ async def read_root():
         return f.read()
 
 
+@app.get("/cabinet", response_class=HTMLResponse)
+async def read_cabinet():
+    with open("static/cabinet.html", "r", encoding="utf-8") as f:
+        return f.read()
+
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 if __name__ == "__main__":

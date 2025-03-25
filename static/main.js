@@ -1,3 +1,6 @@
+
+
+
 async function fetchDishes() {
             try {
                 const response = await fetch("http://localhost:8000/dishes");

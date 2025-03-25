@@ -8,14 +8,25 @@ router = APIRouter()
 
 @router.post("/login/")
 async def login_user_api(user_data: dict = Body(...)):
-    email = user_data.get('email')
-    password = user_data.get('password')
-    user = await login_user(email, password)
-    if user is None:
-        return HTTPException(status_code=400, detail="Invalid password or email")
+    try:
+        email = user_data.get('email')
+        password = user_data.get('password')
+        user = await login_user(email, password)
+        if user is None:
+            raise HTTPException(status_code=400, detail="Invalid password or email")
+        if not hasattr(user, 'email'):
+            raise HTTPException(status_code=500, detail="User object is invalid")
+        authentication_token = create_access_token({"sub": user.email})
+        print(f"[DEBUG] Generated token for {user.email}: {authentication_token}")
 
-    authentication_token = create_access_token({"sub": user.get('email')})
-    return {"status": 200, "access_token": authentication_token, "token_type": "bearer"}
+        return {
+            "access_token": authentication_token,
+            "token_type": "bearer"
+        }
+
+    except Exception as e:
+        print(f"[ERROR] Login error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.post("/register/")

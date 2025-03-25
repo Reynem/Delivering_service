@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Личный кабинет</title>
+</head>
+<body>
+    <h1>Личный кабинет</h1>
+    <div id="userData"></div>
+    <button onclick="logout()">Выйти</button>
+
+    <script src="/static/auth.js"></script>
+    <script>
+        async function loadUserData() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:8000/users/me/', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка аутентификации');
+                }
+
+                const userData = await response.json();
+                document.getElementById('userData').innerHTML = `
+                    <p>Email: ${userData.email}</p>
+                    <!-- Добавьте другие поля пользователя -->
+                `;
+            } catch (error) {
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/';
+        }
+
+        document.addEventListener('DOMContentLoaded', loadUserData);
+    </script>
+</body>
+</html>
