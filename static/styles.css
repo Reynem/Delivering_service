@@ -343,6 +343,131 @@ button:hover {
     font: inherit;
 }
 
+
+
+
+
+/* Стили для личного кабинета */
+.profile-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 800px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.profile-avatar {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.profile-email {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    margin: 1rem 0;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+}
+
+.detail-label {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.detail-value {
+    color: var(--light-text);
+    max-width: 60%;
+    text-align: right;
+}
+
+.account-actions {
+    margin: 3rem auto;
+    max-width: 800px;
+}
+
+.actions-title {
+    font-family: 'Playfair Display', serif;
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.action-btn {
+    background: var(--accent-color);
+    color: var(--light-text);
+    border: none;
+    padding: 1.5rem;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.action-btn:hover {
+    background: var(--primary-color);
+    transform: translateY(-3px);
+}
+
+.edit-form {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2rem;
+    border-radius: 10px;
+    margin: 2rem 0;
+}
+
+.edit-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.edit-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.edit-form input {
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--accent-color);
+    border: 1px solid transparent;
+    border-radius: 5px;
+    color: var(--light-text);
+    transition: border-color 0.3s;
+}
+
+.edit-form input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+.edit-form button {
+    margin-right: 1rem;
+}
+
+
+
 @keyframes slideDown {
     from {
         opacity: 0;
@@ -373,5 +498,20 @@ button:hover {
 
     .auth-title {
         font-size: 1.8rem;
+    }
+
+    .detail-item {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .detail-value {
+        text-align: left;
+        max-width: 100%;
+    }
+
+    .action-btn {
+        font-size: 1rem;
+        padding: 1rem;
     }
 }
