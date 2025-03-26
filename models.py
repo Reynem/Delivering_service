@@ -22,7 +22,7 @@ class DishUpdateRequest(BaseModel):
 
 
 class User(Document):
-    name: str
+    name: Optional[str] = None
     password_hash: str
     email: EmailStr
     phone: Optional[str] = None
@@ -33,7 +33,7 @@ class User(Document):
 
 
 class UserCreate(BaseModel):
-    name: str
+    name: Optional[str] = None
     email: EmailStr
     password: str
     phone: Optional[str] = None
