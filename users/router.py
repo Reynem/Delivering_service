@@ -31,6 +31,27 @@ async def login_user_api(user_data: dict = Body(...)):
 
 @router.post("/register/")
 async def register_user_api(user: UserCreate):
+    if len(user.password) < 8:
+        raise HTTPException(
+            status_code=400,
+            detail="Make password longer!"
+        )
+    elif user.password.islower() or user.password.isupper():
+        raise HTTPException(
+            status_code=400,
+            detail="Add the capital or lowercase letters !"
+        )
+    elif not any(char.isdigit() for char in user.password):
+        raise HTTPException(
+            status_code=400,
+            detail="Password must contain numbers"
+        )
+    elif not any(char in "!@#$%^&*()_+=-`~[]\{}|;':\",./<>?" for char in user.password):
+        raise HTTPException(
+            status_code=400,
+            detail="Password must contain at least one special symbol"
+        )
+
     user = await register_user(user)
     return user
 

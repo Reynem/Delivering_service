@@ -1,6 +1,7 @@
 from beanie import Document, Indexed
 from pydantic import BaseModel, EmailStr
 from typing import Optional
+from datetime import datetime
 
 
 class Dish(Document):
@@ -27,6 +28,9 @@ class User(Document):
     email: EmailStr
     phone: Optional[str] = None
     address: Optional[str] = None
+    telegram_id: Optional[str] = None
+    twofa_code: Optional[str] = None
+    code_expires: Optional[datetime] = None
 
     class Settings:
         name = "Users"
@@ -44,3 +48,10 @@ class UserUpdate(BaseModel):
     name: Optional[str] = None
     phone: Optional[str] = None
     address: Optional[str] = None
+
+
+class PasswordResetRequest(BaseModel):
+    new_password: str
+    old_password: str
+    code: str
+
