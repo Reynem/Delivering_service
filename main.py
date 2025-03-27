@@ -1,7 +1,9 @@
+import asyncio
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
-
+from users.api.telegram_bot import TelegramBot
 import dishes.router
 import users.router
 from database import connect
@@ -11,16 +13,25 @@ from metadata import tags_metadata
 from fastapi.middleware.cors import CORSMiddleware
 from models import Dish, User
 from beanie import init_beanie
+import dotenv
+import os
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global bot
+    dotenv.load_dotenv()
+    telegram_id = os.getenv("TELEGRAM_BOT_ID")
+    bot = TelegramBot(telegram_id)
+    await asyncio.create_task(bot.run())
     database = await connect()
     await init_beanie(database=database, document_models=[Dish, User])
     yield
 
 
 app = FastAPI(lifespan=lifespan, openapi_tags=tags_metadata)
+bot = None
+
 app.add_middleware(
     CORSMiddleware,  # type: ignore
     allow_origins=["*"],
