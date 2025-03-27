@@ -1,7 +1,12 @@
-from fastapi import APIRouter, HTTPException, Body, Depends
+import datetime
+import uuid
+from fastapi import APIRouter, HTTPException, Body, Depends, Request
 from users.database import login_user, register_user
 from models import User, UserCreate, UserUpdate
 from users.auth import create_access_token, get_current_user
+import dotenv
+import os
+
 
 router = APIRouter()
 
@@ -31,6 +36,8 @@ async def login_user_api(user_data: dict = Body(...)):
 
 @router.post("/register/")
 async def register_user_api(user: UserCreate):
+    special_characters = set("!@#$%^&*()_+=-`~[]\\{}|;':\",./<>?")
+
     if len(user.password) < 8:
         raise HTTPException(
             status_code=400,
@@ -46,7 +53,8 @@ async def register_user_api(user: UserCreate):
             status_code=400,
             detail="Password must contain numbers"
         )
-    elif not any(char in "!@#$%^&*()_+=-`~[]\{}|;':\",./<>?" for char in user.password):
+
+    elif not any(char in special_characters for char in user.password):
         raise HTTPException(
             status_code=400,
             detail="Password must contain at least one special symbol"
@@ -76,3 +84,20 @@ async def edit_user_profile(user_changes: UserUpdate, current_user: User = Depen
             status_code=500,
             detail="Internal server exception"
         )
+
+
+@router.post("/user/request-reset-password")
+async def reset_user_password(email: str, request: Request):
+    user = await User.find_one(User.email == email)
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User is not found"
+        )
+
+    code = str(uuid.uuid4())[:6]
+    user.twofa_code = code
+    user.code_expires = datetime.datetime.now() + datetime.timedelta(minutes=10)
+    await user.save()
+
+
