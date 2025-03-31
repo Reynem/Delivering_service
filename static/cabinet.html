@@ -77,6 +77,14 @@
                     🔒 Сменить пароль
                 </button>
             </div>
+
+            <div class="security-section">
+                <h3>Привязка Telegram</h3>
+                <p>Ваш Chat ID: <span id="telegramChatId">Не привязан</span></p>
+                <button onclick="connectTelegram()" class="btn-primary">
+                    Привязать Telegram
+                </button>
+            </div>
         </section>
     </main>
 
@@ -92,6 +100,12 @@
     </footer>
 
     <script>
+        async function connectTelegram() {
+            const response = await fetch('/get-telegram-id');
+            const data = await response.json();
+            alert(`Отправьте боту @YourBotName команду:\n/start ${data.temp_token}`);
+        }
+
         // Загрузка данных пользователя
         async function loadUserData() {
             const token = localStorage.getItem('token');

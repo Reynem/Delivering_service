@@ -2,11 +2,10 @@ import datetime
 import uuid
 from fastapi import APIRouter, HTTPException, Body, Depends, Request
 from users.database import login_user, register_user
-from models import User, UserCreate, UserUpdate
+from models import User, UserCreate, UserUpdate, PasswordResetRequest
 from users.auth import create_access_token, get_current_user
-import dotenv
-import os
 
+from users.encryption import hash_password
 
 router = APIRouter()
 
@@ -99,5 +98,24 @@ async def reset_user_password(email: str, request: Request):
     user.twofa_code = code
     user.code_expires = datetime.datetime.now() + datetime.timedelta(minutes=10)
     await user.save()
+
+
+@router.post("/user/reset-password")
+async def reset_password_api(data: PasswordResetRequest):
+    user = await User.find_one(User.email == data.email)
+    if not user:
+        raise HTTPException(404, "User is not found")
+    if user.twofa_code != data.code:
+        raise HTTPException(400, "Inappropriate code")
+    if datetime.datetime.now() > user.code_expires:
+        raise HTTPException(400, "The code has expired")
+
+    user.password_hash = hash_password(data.new_password)
+    user.twofa_code = None
+    user.code_expires = None
+    await user.save()
+
+    return {"status": "Password changed successfully"}
+
 
 
