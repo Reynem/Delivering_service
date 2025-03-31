@@ -2,10 +2,9 @@ import datetime
 import uuid
 from fastapi import APIRouter, HTTPException, Body, Depends, Request
 from users.database import login_user, register_user
-from models import User, UserCreate, UserUpdate, PasswordResetRequest
+from models import User, UserCreate, UserUpdate
 from users.auth import create_access_token, get_current_user
 
-from users.encryption import hash_password
 
 router = APIRouter()
 
@@ -85,37 +84,39 @@ async def edit_user_profile(user_changes: UserUpdate, current_user: User = Depen
         )
 
 
-@router.post("/user/request-reset-password")
-async def reset_user_password(email: str, request: Request):
-    user = await User.find_one(User.email == email)
+@router.post("/user/telegram/request-link")
+async def request_telegram_link(request: Request, current_user: User = Depends(get_current_user)):
+    code = str(uuid.uuid4())[:8]
+    current_user.twofa_code = code
+    current_user.code_expires = datetime.datetime.now() + datetime.timedelta(minutes=15)
+    await current_user.save()
+    return {"temp_token": code}
+
+
+@router.post("/user/telegram/link")
+async def reset_password_api(data: dict = Body(...)):
+    temp_token = data.get("temp_token")
+    chat_id = data.get("chat_id")
+    print(data)
+    if not temp_token or not chat_id:
+        print("token or id is missing")
+        raise HTTPException(404, "Token or id is missing")
+
+    user = await User.find_one(User.twofa_code == temp_token)
     if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="User is not found"
-        )
-
-    code = str(uuid.uuid4())[:6]
-    user.twofa_code = code
-    user.code_expires = datetime.datetime.now() + datetime.timedelta(minutes=10)
-    await user.save()
-
-
-@router.post("/user/reset-password")
-async def reset_password_api(data: PasswordResetRequest):
-    user = await User.find_one(User.email == data.email)
-    if not user:
-        raise HTTPException(404, "User is not found")
-    if user.twofa_code != data.code:
-        raise HTTPException(400, "Inappropriate code")
+        print("inappropriate token")
+        raise HTTPException(404, "Inappropriate token")
     if datetime.datetime.now() > user.code_expires:
-        raise HTTPException(400, "The code has expired")
+        raise HTTPException(400, "The token has expired")
 
-    user.password_hash = hash_password(data.new_password)
+    user.telegram_id = chat_id
     user.twofa_code = None
     user.code_expires = None
     await user.save()
 
-    return {"status": "Password changed successfully"}
+    return {"status": "Telegram account linked successfully"}
 
 
-
+@router.get("/users/me/telegram")
+async def get_user_telegram_status(current_user: User = Depends(get_current_user)):
+    return {"telegram_id": current_user.telegram_id}

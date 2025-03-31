@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Навигационная панель -->
     <nav class="navbar">
         <div class="brand">Gourmet House</div>
         <div class="auth-links">
@@ -16,11 +15,9 @@
         </div>
     </nav>
 
-    <!-- Основной контент -->
     <main class="container">
         <h2 class="section-title">Личный кабинет</h2>
 
-        <!-- Карточка профиля -->
         <div class="profile-card">
             <div class="profile-header">
                 <div class="profile-avatar">👤</div>
@@ -43,7 +40,6 @@
             </div>
         </div>
 
-        <!-- Форма редактирования -->
         <div class="edit-form" id="editForm" style="display: none;">
             <h3 class="actions-title">Редактировать профиль</h3>
             <form id="profileForm">
@@ -66,17 +62,13 @@
             </form>
         </div>
 
-        <!-- Действия -->
         <section class="account-actions">
             <h3 class="actions-title">Действия</h3>
             <div class="actions-grid">
                 <button class="action-btn" onclick="showEditForm()">
                     ✏️ Редактировать профиль
                 </button>
-                <button class="action-btn" onclick="changePassword()">
-                    🔒 Сменить пароль
-                </button>
-            </div>
+                </div>
 
             <div class="security-section">
                 <h3>Привязка Telegram</h3>
@@ -88,7 +80,6 @@
         </section>
     </main>
 
-    <!-- Подвал -->
     <footer class="main-footer">
         <div class="footer-content">
             <div class="footer-section">
@@ -101,9 +92,32 @@
 
     <script>
         async function connectTelegram() {
-            const response = await fetch('/get-telegram-id');
-            const data = await response.json();
-            alert(`Отправьте боту @YourBotName команду:\n/start ${data.temp_token}`);
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:8000/user/telegram/request-link', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Ошибка при запросе временного токена');
+                }
+
+                const data = await response.json();
+                alert(`Отправьте боту команду:\n/start ${data.temp_token}`);
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Не удалось получить временный токен для Telegram');
+            }
         }
 
         // Загрузка данных пользователя
@@ -115,22 +129,48 @@
             }
 
             try {
-                const response = await fetch('http://localhost:8000/users/me/', {
+                const userResponse = await fetch('http://localhost:8000/users/me/', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     }
                 });
 
-                if (!response.ok) throw new Error('Ошибка загрузки данных');
+                if (!userResponse.ok) throw new Error('Ошибка загрузки данных пользователя');
 
-                const userData = await response.json();
+                const userData = await userResponse.json();
 
-                // Заполнение данных
+                // Заполнение основных данных
                 document.getElementById('userEmail').textContent = userData.email;
                 document.getElementById('userName').textContent = userData.name || 'Не указано';
                 document.getElementById('userPhone').textContent = userData.phone || 'Не указан';
                 document.getElementById('userAddress').textContent = userData.address || 'Не указан';
+
+                // Загрузка статуса Telegram
+                const telegramResponse = await fetch('http://localhost:8000/users/me/telegram', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const telegramChatIdSpan = document.getElementById('telegramChatId');
+                const connectTelegramButton = document.querySelector('.security-section button');
+
+                if (telegramResponse.ok) {
+                    const telegramData = await telegramResponse.json();
+                    if (telegramData.telegram_id) { // Проверяем, что telegram_id не null и не undefined
+                        telegramChatIdSpan.textContent = telegramData.telegram_id;
+                        connectTelegramButton.style.display = 'none'; // Скрываем кнопку
+                    } else {
+                        telegramChatIdSpan.textContent = 'Не привязан';
+                        connectTelegramButton.style.display = 'block'; // Показываем кнопку
+                    }
+                } else {
+                    console.error('Ошибка загрузки статуса Telegram');
+                    telegramChatIdSpan.textContent = 'Ошибка загрузки';
+                    connectTelegramButton.style.display = 'block'; // Показываем кнопку на случай ошибки
+                }
 
             } catch (error) {
                 console.error('Ошибка:', error);

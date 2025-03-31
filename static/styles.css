@@ -402,6 +402,7 @@ button:hover {
     color: var(--primary-color);
     text-align: center;
     margin-bottom: 2rem;
+    font-size: 30px;
 }
 
 .actions-grid {
@@ -466,7 +467,23 @@ button:hover {
     margin-right: 1rem;
 }
 
+.security-section h3 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    margin-top: 20px;
+    font-size: 1.5em;
+}
 
+.security-section p {
+    font-size: 1em;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.security-section p span {
+    font-weight: bold; /* Выделение Chat ID жирным */
+    color: #007bff; /* Синий цвет для Chat ID */
+}
 
 @keyframes slideDown {
     from {

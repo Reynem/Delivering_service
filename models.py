@@ -30,7 +30,7 @@ class User(Document):
     email: EmailStr
     phone: Optional[str] = None
     address: Optional[str] = None
-    telegram_id: Optional[str] = None
+    telegram_id: Optional[int] = None
     twofa_code: Optional[str] = None
     code_expires: Optional[datetime] = None
 
@@ -50,10 +50,3 @@ class UserUpdate(BaseModel):
     name: Optional[str] = None
     phone: Optional[str] = None
     address: Optional[str] = None
-
-
-class PasswordResetRequest(BaseModel):
-    new_password: str
-    old_password: str
-    code: str
-
