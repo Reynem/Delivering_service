@@ -1,10 +1,22 @@
-import re
 
 from beanie import Document, Indexed
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from datetime import datetime
 
+
+class Admin(Document):
+    username: str
+    password: str
+    is_active: bool = True
+    created_at: datetime = Field(datetime.now())
+    updated_at: Optional[datetime] = None
+
+    class Settings:
+        name = "admins"
+
+
+# Dishes
 
 class Dish(Document):
     name: str
