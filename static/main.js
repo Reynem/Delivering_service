@@ -27,3 +27,40 @@ async function fetchDishes() {
         }
 
         fetchDishes();
+
+ document.addEventListener('DOMContentLoaded', function() {
+        const token = localStorage.getItem('token');
+        const loginLink = document.getElementById('loginLink');
+        const registerLink = document.getElementById('registerLink');
+        const cabinetLink = document.getElementById('cabinetLink');
+        const logoutButton = document.getElementById('logoutButton');
+        const cartButton = document.getElementById('cartButton');
+        const cartPopup = document.getElementById('cartPopup');
+
+        if (token) {
+            loginLink.style.display = 'none';
+            registerLink.style.display = 'none';
+            cabinetLink.style.display = 'inline-block';
+            logoutButton.style.display = 'inline-block';
+        } else {
+            cabinetLink.style.display = 'none';
+            logoutButton.style.display = 'none';
+            loginLink.style.display = 'inline-block';
+            registerLink.style.display = 'inline-block';
+        }
+
+        logoutButton.addEventListener('click', function() {
+            localStorage.removeItem('token');
+            window.location.reload();
+        });
+
+        cartButton.addEventListener('click', function() {
+            cartPopup.style.display = cartPopup.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!cartPopup.contains(event.target) && !cartButton.contains(event.target)) {
+                cartPopup.style.display = 'none';
+            }
+        });
+    });

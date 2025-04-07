@@ -17,6 +17,11 @@
                 <a href="register" class="btn-primary" id="registerLink">Регистрация</a>
                 <a href="/cabinet" class="btn-primary"  id="cabinetLink" style="display: none;">Личный кабинет</a>
                 <button id="logoutButton" style="display: none;">Выйти</button>
+                <button class="cart-button" id="cartButton">
+                    <i class="fas fa-shopping-cart cart-icon"></i>
+                    <img src="/static/cart.png" width="32px" height="32px">
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
             </div>
         </nav>
 
@@ -67,6 +72,20 @@
             </div>
         </div>
     </footer>
+
+    <div class="cart-popup" id="cartPopup">
+        <h3>Корзина</h3>
+        <div id="cartItems">
+            <p class="cart-empty">Ваша корзина пуста.</p>
+            </div>
+        <div class="cart-total" id="cartTotal">
+            Итого: 0 ₽
+        </div>
+        <div class="cart-actions">
+            <button class="clear-button" id="clearCart">Очистить корзину</button>
+            <button class="checkout-button" id="checkoutButton">Оформить заказ</button>
+        </div>
+    </div>
 
     <script src="static/main.js">
     </script>
