@@ -11,7 +11,7 @@ async def add_cart_item(cart: Cart):
             user_item.quantity += cart.quantity
             await user_item.save()
             return {"status": 200, "detail": "Items updated"}
-        await cart.save_changes()
+        await cart.save()
         return {"status": 200, "detail": "New items added"}
     except Exception as e:
         raise HTTPException(400, str(e))
@@ -23,7 +23,7 @@ async def show_cart(user_email: EmailStr):
         if not cart_items:
             raise HTTPException(404, "No items in cart")
         total_price = sum(item.price * item.quantity for item in cart_items)
-        return {"status": 200, "cart": cart_items, "total_price": total_price}
+        return {"status": "OK", "items": cart_items, "total_price": total_price}
     except Exception as e:
         raise HTTPException(400, str(e))
 

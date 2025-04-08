@@ -439,6 +439,7 @@ button:hover {
     z-index: 1000;
     padding: 15px;
     width: 300px;
+    color:black;
 }
 
 .cart-popup h3 {

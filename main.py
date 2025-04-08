@@ -3,9 +3,12 @@ import asyncio
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
+
+from carts.models import Cart
 from users.api.telegram_bot import TelegramBot
 import dishes.router
 import users.router
+import carts.router
 from database import connect
 import uvicorn
 from contextlib import asynccontextmanager
@@ -26,7 +29,7 @@ async def lifespan(app: FastAPI):
     bot = TelegramBot(telegram_id)
     await asyncio.create_task(bot.run())
     database = await connect()
-    await init_beanie(database=database, document_models=[Dish, User])
+    await init_beanie(database=database, document_models=[Dish, User, Cart])
     yield
 
 
@@ -43,6 +46,7 @@ app.add_middleware(
 
 app.include_router(router=dishes.router.router)
 app.include_router(router=users.router.router)
+app.include_router(router=carts.router.router)
 
 
 @app.get("/", response_class=HTMLResponse)
