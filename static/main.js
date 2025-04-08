@@ -1,33 +1,4 @@
 
-
-
-async function fetchDishes() {
-            try {
-                const response = await fetch("http://localhost:8000/dishes");
-                if (!response.ok) {
-                    throw new Error("Ошибка загрузки данных");
-                }
-                const dishes = await response.json();
-                renderDishes(dishes);
-            } catch (error) {
-                console.error("Ошибка при загрузке блюд:", error);
-            }
-        }
-
-        function renderDishes(dishes) {
-            const menuContainer = document.getElementById("menu");
-            menuContainer.innerHTML = "";
-
-            dishes.forEach(dish => {
-                const dishElement = document.createElement("div");
-                dishElement.classList.add("dish");
-                dishElement.innerHTML = `<h3>${dish.name}</h3><p>${dish.category}</p><p>${dish.price} руб.</p>`;
-                menuContainer.appendChild(dishElement);
-            });
-        }
-
-        fetchDishes();
-
  document.addEventListener('DOMContentLoaded', function() {
     loadMenu(); // Функция для загрузки меню (предполагается, что она у вас есть)
     setupCartEventListeners();
@@ -44,7 +15,7 @@ function setupCartEventListeners() {
     const cartPopup = document.getElementById('cartPopup');
     const clearCartButton = document.getElementById('clearCart');
     const checkoutButton = document.getElementById('checkoutButton');
-    const menuGrid = document.getElementById('menu'); // Предполагается, что у вас есть элемент с id "menu"
+    const menuGrid = document.getElementById('menu');
 
     if (cartButton) {
         cartButton.addEventListener('click', toggleCartPopup);
@@ -316,12 +287,12 @@ async function updateCartDisplay() {
 // Пример функции для загрузки меню (вам нужно реализовать свою логику)
 async function loadMenu() {
     try {
-        const response = await fetch('/dishes/'); // Используем ваш эндпоинт для получения всех блюд
+        const response = await fetch('/dishes/');
         if (response.ok) {
             const dishes = await response.json();
             const menuContainer = document.getElementById('menu');
             if (menuContainer) {
-                menuContainer.innerHTML = ''; // Очищаем предыдущее меню
+                menuContainer.innerHTML = '';
                 dishes.forEach(dish => {
                     const dishElement = document.createElement('div');
                     dishElement.classList.add('menu-item'); // Добавьте свой класс для стиля

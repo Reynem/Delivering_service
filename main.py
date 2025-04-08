@@ -11,7 +11,8 @@ import uvicorn
 from contextlib import asynccontextmanager
 from metadata import tags_metadata
 from fastapi.middleware.cors import CORSMiddleware
-from models import Dish, User
+from models import User
+from dishes.models import Dish
 from beanie import init_beanie
 import dotenv
 import os

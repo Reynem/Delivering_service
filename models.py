@@ -1,5 +1,5 @@
 
-from beanie import Document, Indexed
+from beanie import Document
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from datetime import datetime
@@ -14,23 +14,6 @@ class Admin(Document):
 
     class Settings:
         name = "admins"
-
-
-# Dishes
-
-class Dish(Document):
-    name: str
-    price: Indexed(float)
-    category: str
-
-    class Settings:
-        name = "dishes"
-
-
-class DishUpdateRequest(BaseModel):
-    old_value: str | float
-    new_value: str | float
-    field: str  # "name", "price", "category"
 
 
 # Users:
