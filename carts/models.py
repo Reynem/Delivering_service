@@ -11,3 +11,4 @@ class Cart(Document):
 
     class Settings:
         name = "dishes"
+        use_state_management = True
