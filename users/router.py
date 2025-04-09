@@ -97,7 +97,6 @@ async def request_telegram_link(request: Request, current_user: User = Depends(g
 async def reset_password_api(data: dict = Body(...)):
     temp_token = data.get("temp_token")
     chat_id = data.get("chat_id")
-    print(data)
     if not temp_token or not chat_id:
         print("token or id is missing")
         raise HTTPException(404, "Token or id is missing")
