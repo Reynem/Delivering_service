@@ -129,6 +129,12 @@ async function loadCartItems() {
             }
         });
 
+        // Если сессия истекла
+        if (response.status === 401) {
+            handleUnauthorized();
+            return;
+        }
+
         if (response.ok) {
             const cartData = await response.json();
             console.log('Данные корзины, полученные от сервера:', cartData);
@@ -365,4 +371,11 @@ async function loadMenu() {
     } catch (error) {
         console.error('Ошибка при загрузке меню:', error);
     }
+}
+
+function handleUnauthorized() {
+    // Очистим токен и перенаправим на страницу логина
+    localStorage.removeItem('token');
+    alert('Ваша сессия истекла, пожалуйста, войдите снова.');
+    window.location.href = '/login'; // или другой URL страницы логина
 }
