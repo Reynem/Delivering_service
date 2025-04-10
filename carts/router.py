@@ -2,12 +2,59 @@ import datetime
 
 from fastapi import Query, Depends, Body
 from fastapi.routing import APIRouter
-from pydantic import EmailStr
 from users.auth import get_current_user
 from carts.models import Cart, CartIn
 from carts.database import (add_cart_item, show_cart, cart_clear, cart_delete,
                             cart_update)
+import logging
+from logging.config import dictConfig
+import sys
 
+
+LOG_CONFIG = {
+    "version": 1,
+    "formatters": {
+        "json": {
+            "format": "%(asctime)s %(levelname)s %(message)s",
+            "datefmt": "%Y-%m-%dT%H:%M:%SZ"
+        },
+        "colored": {
+            "()": "colorlog.ColoredFormatter",
+            "format": "%(log_color)s%(asctime)s [%(levelname)s] %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+            "log_colors": {
+                'DEBUG': 'cyan',
+                'INFO': 'green',
+                'WARNING': 'yellow',
+                'ERROR': 'red',
+                'CRITICAL': 'red,bg_white',
+            }
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "colorlog.StreamHandler",
+            "formatter": "colored",
+            "stream": sys.stdout
+        },
+        "file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "json",
+            "filename": "orders.log",
+            "maxBytes": 10485760,
+            "backupCount": 3
+        }
+    },
+    "loggers": {
+        "app": {
+            "handlers": ["console", "file"],
+            "level": "INFO"
+        }
+    }
+}
+
+dictConfig(LOG_CONFIG)
+logger = logging.getLogger("app")
 
 router = APIRouter()
 
@@ -59,22 +106,38 @@ async def update_cart_item_api(
 
 @router.post('/api/orders/create', status_code=200)
 async def create_order_api(user=Depends(get_current_user)):
-    cart_items = await show_cart(user.email)
-    print(cart_items)
-    items = cart_items.get("items")
-    order_data = {
-        "user_email": user.email,
-        "timestamp": datetime.datetime.now(datetime.UTC).isoformat(),
-        "items": [
-            {"dish_name": item.dish_name, "quantity": item.quantity,
-             "price": item.price}
-            for item in items
-        ],
-        "total_price": cart_items.get("total_price")
-    }
+    logger.info(f"Order creation started for {user.email}")
 
-    print("--- НОВЫЙ ЗАКАЗ ---")
-    print(order_data)
-    print("--------------------")
+    try:
+        cart_items = await show_cart(user.email)
+        logger.debug(f"Raw cart data: {cart_items}")
 
-    return {"status": "OK", "message": "Заказ успешно создан (данные записаны в лог)."}
+        items = cart_items.get("items")
+
+        order_data = {
+            "user_email": user.email,
+            "timestamp": datetime.datetime.now(datetime.UTC).isoformat(),
+            "items": [
+                {
+                    "dish_name": item.dish_name,
+                    "quantity": item.quantity,
+                    "price": item.price
+                } for item in items
+            ],
+            "total_price": cart_items.get("total_price")
+        }
+
+        logger.info({
+            "order": {
+                "user": user.email,
+                "total_price": order_data["total_price"],
+                "item_count": len(order_data["items"]),
+                "dishes": [item["dish_name"] for item in order_data["items"]]
+            }
+        })
+
+        return {"status": "OK", "message": "Заказ успешно создан"}
+
+    except Exception as e:
+        logger.error(f"Order failed: {str(e)}", exc_info=True)
+        return {"status": "error", "message": "Internal server error"}

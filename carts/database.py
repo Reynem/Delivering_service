@@ -21,11 +21,11 @@ async def show_cart(user_email: EmailStr):
     try:
         cart_items = await Cart.find(Cart.user_email == user_email).to_list()
         if not cart_items:
-            raise HTTPException(404, "No items in cart")
+            pass
         total_price = sum(item.price * item.quantity for item in cart_items)
         return {"status": "OK", "items": cart_items, "total_price": total_price}
     except Exception as e:
-        raise HTTPException(400, str(e))
+        print(e)
 
 
 async def cart_delete(user_email: EmailStr, dish_name: str, quantity: float):
