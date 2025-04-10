@@ -1,3 +1,5 @@
+import datetime
+
 from fastapi import Query, Depends, Body
 from fastapi.routing import APIRouter
 from pydantic import EmailStr
@@ -53,3 +55,26 @@ async def update_cart_item_api(
 ):
     await cart_update(user.email, dish_name, quantity)
     return {"status": "OK", "message": f"{dish_name}`s quantity changed by {quantity}"}
+
+
+@router.post('/api/orders/create', status_code=200)
+async def create_order_api(user=Depends(get_current_user)):
+    cart_items = await show_cart(user.email)
+    print(cart_items)
+    items = cart_items.get("items")
+    order_data = {
+        "user_email": user.email,
+        "timestamp": datetime.datetime.now(datetime.UTC).isoformat(),
+        "items": [
+            {"dish_name": item.dish_name, "quantity": item.quantity,
+             "price": item.price}
+            for item in items
+        ],
+        "total_price": cart_items.get("total_price")
+    }
+
+    print("--- НОВЫЙ ЗАКАЗ ---")
+    print(order_data)
+    print("--------------------")
+
+    return {"status": "OK", "message": "Заказ успешно создан (данные записаны в лог)."}

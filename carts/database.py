@@ -36,7 +36,6 @@ async def cart_delete(user_email: EmailStr, dish_name: str, quantity: float):
 
         for _ in range(int(quantity)):
             item_client = client_cart.pop()
-            print(item_client)
             if item_client.quantity - 1 > 0:
                 item_client.quantity -= 1
                 await item_client.save_changes()
