@@ -1,9 +1,12 @@
+from fastapi.security import HTTPBasicCredentials, HTTPBasic
 from motor.motor_asyncio import AsyncIOMotorClient
 import asyncio
-from beanie import init_beanie
-from models import User, UserCreate
-from fastapi import HTTPException
+from models import User, UserCreate, Admin
+from fastapi import HTTPException, Depends
 from users.encryption import hash_password, verify_password
+
+
+security = HTTPBasic()
 
 
 async def connect():
@@ -40,6 +43,17 @@ async def register_user(user: UserCreate):
             status_code=500,
             detail="Internal Server error"
         )
+
+
+async def get_current_admin(credentials: HTTPBasicCredentials = Depends(security)):
+    admin = await Admin.get_admin(credentials.username)
+    if not admin or not verify_password(credentials.password, admin.password):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return admin
 
 
 if __name__ == "__main__":

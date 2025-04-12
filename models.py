@@ -1,4 +1,3 @@
-
 from beanie import Document
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
@@ -14,6 +13,10 @@ class Admin(Document):
 
     class Settings:
         name = "admins"
+
+    @classmethod
+    async def get_admin(cls, username: str) -> Optional["Admin"]:
+        return await cls.find_one({"username": username, "is_active": True})
 
 
 # Users:

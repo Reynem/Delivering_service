@@ -1,8 +1,11 @@
 import asyncio
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from fastapi.security import HTTPBasic
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
+from starlette.requests import Request
+from starlette.templating import Jinja2Templates
 
 from carts.models import Cart
 from users.api.telegram_bot import TelegramBot
@@ -14,11 +17,13 @@ import uvicorn
 from contextlib import asynccontextmanager
 from metadata import tags_metadata
 from fastapi.middleware.cors import CORSMiddleware
-from models import User
+from models import User, Admin
 from dishes.models import Dish
 from beanie import init_beanie
 import dotenv
 import os
+
+from users.database import get_current_admin
 
 
 @asynccontextmanager
@@ -29,12 +34,14 @@ async def lifespan(app: FastAPI):
     bot = TelegramBot(telegram_id)
     await asyncio.create_task(bot.run())
     database = await connect()
-    await init_beanie(database=database, document_models=[Dish, User, Cart])
+    await init_beanie(database=database, document_models=[Dish, User, Cart, Admin])
     yield
 
 
 app = FastAPI(lifespan=lifespan, openapi_tags=tags_metadata)
+templates = Jinja2Templates(directory="templates")
 bot = None
+
 
 app.add_middleware(
     CORSMiddleware,  # type: ignore
@@ -71,6 +78,12 @@ async def read_root():
 async def read_cabinet():
     with open("static/cabinet.html", "r", encoding="utf-8") as f:
         return f.read()
+
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_panel(request: Request, admin: Admin = Depends(get_current_admin)):
+    return templates.TemplateResponse("admin/dashboard.html", {"request": request, "admin": admin})
+
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
