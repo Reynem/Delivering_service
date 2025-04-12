@@ -1,7 +1,6 @@
 import asyncio
 
 from fastapi import FastAPI, Depends
-from fastapi.security import HTTPBasic
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from starlette.requests import Request
@@ -24,6 +23,7 @@ import dotenv
 import os
 
 from users.database import get_current_admin
+from users.encryption import hash_password
 
 
 @asynccontextmanager
@@ -35,6 +35,14 @@ async def lifespan(app: FastAPI):
     await asyncio.create_task(bot.run())
     database = await connect()
     await init_beanie(database=database, document_models=[Dish, User, Cart, Admin])
+    admin_count = await Admin.count()
+    if admin_count == 0:
+        admin = Admin(
+            username="admin",
+            password=hash_password("admin")
+        )
+        await admin.save()
+        print("Initial admin created! Username: admin, Password: admin")
     yield
 
 
@@ -82,7 +90,7 @@ async def read_cabinet():
 
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_panel(request: Request, admin: Admin = Depends(get_current_admin)):
-    return templates.TemplateResponse("admin/dashboard.html", {"request": request, "admin": admin})
+    return templates.TemplateResponse("admin/login.html", {"request": request, "admin": admin})
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
