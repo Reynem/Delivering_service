@@ -3,6 +3,7 @@ import asyncio
 from fastapi import FastAPI, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
+from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 from starlette.templating import Jinja2Templates
 
@@ -58,6 +59,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))  # type: ignore
 
 app.include_router(router=dishes.router.router)
 app.include_router(router=users.router.router)

@@ -1,7 +1,7 @@
 from beanie import Document
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, UTC
 
 
 class Admin(Document):
@@ -18,6 +18,10 @@ class Admin(Document):
     async def get_admin(cls, username: str) -> Optional["Admin"]:
         return await cls.find_one({"username": username, "is_active": True})
 
+    async def save(self, *args, **kwargs):
+        self.updated_at = datetime.now(tz=UTC)
+        await super().save(*args, **kwargs)
+        
 
 # Users:
 

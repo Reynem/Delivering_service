@@ -45,16 +45,5 @@ async def register_user(user: UserCreate):
         )
 
 
-async def get_current_admin(credentials: HTTPBasicCredentials = Depends(security)):
-    admin = await Admin.get_admin(credentials.username)
-    if not admin or not verify_password(credentials.password, admin.password):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-    return admin
-
-
 if __name__ == "__main__":
     asyncio.run(connect())
