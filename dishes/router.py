@@ -1,9 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from admin.router import get_current_admin
 from dishes.database import (get_dish, get_dishes, add_dish, delete_dish,
                              change_dish)
 from dishes.models import Dish
 from dishes.models import DishUpdateRequest
+from models import Admin
 
 router = APIRouter()
 
@@ -21,17 +23,17 @@ async def get_dish_api(category: str):
 
 
 @router.post("/api/add-dish", tags=["dishes"], summary="Add a new dish")
-async def add_dish_api(dish: Dish):
+async def add_dish_api(dish: Dish, admin: Admin = Depends(get_current_admin)):
     await add_dish(dish)
 
 
 @router.delete("/api/delete-dish/{name}", tags=["dishes"], summary="Delete a dish by name")
-async def delete_dish_api(name: str):
+async def delete_dish_api(name: str, admin: Admin = Depends(get_current_admin)):
     await delete_dish(name)
 
 
 @router.post("/change-dish/", tags=["dishes"], summary="Change dish details")
-async def change_dish_api(request: DishUpdateRequest):
+async def change_dish_api(request: DishUpdateRequest, admin: Admin = Depends(get_current_admin)):
     try:
         await change_dish(request.old_value, request.new_value, request.field)
     except Exception as e:

@@ -1,9 +1,12 @@
-from fastapi import APIRouter, HTTPException, Form
+from functools import wraps
+
+from fastapi import APIRouter, HTTPException, Form, Depends
 from fastapi.security import OAuth2PasswordBearer
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.templating import Jinja2Templates
 
+from dishes.database import get_dishes
 from models import Admin
 from users.encryption import verify_password
 
@@ -42,3 +45,14 @@ async def admin_login_api(
     return RedirectResponse(url="/admin/dashboard", status_code=303)
 
 
+@router.get("/dashboard", response_class=HTMLResponse)
+async def admin_dashboard(
+    request: Request,
+    admin: Admin = Depends(get_current_admin)
+):
+    dishes = await get_dishes()
+    serialized_dishes = [dish.serialize() for dish in dishes]
+    return templates.TemplateResponse(
+        "dashboard.html",
+        {"request": request, "dishes": serialized_dishes}
+    )

@@ -1,30 +1,238 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ title }}</title>
+    <title>Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <style>
+        .action-buttons { white-space: nowrap; }
+        .hover-row:hover { background-color: #f8f9fa; cursor: pointer; }
+    </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <h1>{{ title }}</h1>
-        <div class="row mt-4">
-            <div class="col-md-3">
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 bg-light sidebar">
                 <div class="list-group">
-                    {% for model_id, model_name in models %}
-                    <a href="/admin/{{ model_id }}" class="list-group-item list-group-item-action">{{ model_name }}</a>
-                    {% endfor %}
+                    <a href="/admin/dashboard" class="list-group-item list-group-item-action active">Dashboard</a>
+                    <a href="/admin/dishes" class="list-group-item list-group-item-action">Dishes Management</a>
+                    <a href="/admin/users" class="list-group-item list-group-item-action">Users</a>
                 </div>
             </div>
-            <div class="col-md-9">
-                <div class="card">
-                    <div class="card-body">
-                        <h2>Добро пожаловать в админ-панель</h2>
-                        <p>Выберите модель из списка слева для управления данными.</p>
-                    </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Dishes Management</h2>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDishModal">
+                        Add New Dish
+                    </button>
                 </div>
+
+                <!-- Dishes Table -->
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dishesTable">
+                        {% for dish in dishes %}
+                        <tr data-id="{{ dish.id }}">
+                            <td>{{ dish.name }}</td>
+                            <td>{{ dish.category }}</td>
+                            <td>${{ dish.price }}</td>
+                            <td>{{ dish.description[:50] }}...</td>
+                            <td class="action-buttons">
+                                <button class="btn btn-sm btn-warning edit-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editDishModal"
+                                        data-dish='{{ dish | tojson }}'>
+                                    Edit
+                                </button>
+                                <button class="btn btn-sm btn-danger delete-btn"
+                                        data-id="{{ dish.name }}">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+
+    <!-- Add Dish Modal -->
+    <div class="modal fade" id="addDishModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="addDishForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add New Dish</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <input type="text" class="form-control" name="category" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Price</label>
+                            <input type="number" step="0.01" class="form-control" name="price" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add Dish</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Dish Modal -->
+    <div class="modal fade" id="editDishModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="editDishForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Dish</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="name">
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <input type="text" class="form-control" name="category" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Price</label>
+                            <input type="number" step="0.01" class="form-control" name="price" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add Dish
+        document.getElementById('addDishForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = Object.fromEntries(new FormData(e.target));
+
+            try {
+                const response = await fetch('/api/add-dish', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Error adding dish');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        // Delete Dish
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (confirm('Are you sure you want to delete this dish?')) {
+                    const dishName = btn.dataset.id;
+
+                    try {
+                        const response = await fetch(`/api/delete-dish/${dishName}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+                            }
+                        });
+
+                        if (response.ok) {
+                            btn.closest('tr').remove();
+                        } else {
+                            alert('Error deleting dish');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                }
+            });
+        });
+
+        // Edit Dish
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const dish = JSON.parse(btn.dataset.dish);
+                const form = document.getElementById('editDishForm');
+
+                form.elements.name.value = dish.name;
+                form.elements.category.value = dish.category;
+                form.elements.price.value = dish.price;
+                form.elements.description.value = dish.description;
+            });
+        });
+
+        document.getElementById('editDishForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = Object.fromEntries(new FormData(e.target));
+
+            try {
+                const response = await fetch('/change-dish/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
+                    },
+                    body: JSON.stringify({
+                        old_value: formData.name,
+                        field: 'full', // или конкретное поле для изменения
+                        new_value: {
+                            category: formData.category,
+                            price: formData.price,
+                            description: formData.description
+                        }
+                    })
+                });
+
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Error updating dish');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    </script>
 </body>
 </html>

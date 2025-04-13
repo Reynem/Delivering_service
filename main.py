@@ -7,6 +7,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 from starlette.templating import Jinja2Templates
 
+from admin.router import router as admin_router
 from carts.models import Cart
 from users.api.telegram_bot import TelegramBot
 import dishes.router
@@ -22,8 +23,6 @@ from dishes.models import Dish
 from beanie import init_beanie
 import dotenv
 import os
-
-from users.database import get_current_admin
 from users.encryption import hash_password
 
 
@@ -64,6 +63,7 @@ app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))  # typ
 app.include_router(router=dishes.router.router)
 app.include_router(router=users.router.router)
 app.include_router(router=carts.router.router)
+app.include_router(router=admin_router)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -88,11 +88,6 @@ async def read_root():
 async def read_cabinet():
     with open("static/cabinet.html", "r", encoding="utf-8") as f:
         return f.read()
-
-
-@app.get("/admin", response_class=HTMLResponse)
-async def admin_panel(request: Request, admin: Admin = Depends(get_current_admin)):
-    return templates.TemplateResponse("admin/login.html", {"request": request, "admin": admin})
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

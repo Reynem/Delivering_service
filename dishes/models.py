@@ -1,5 +1,5 @@
 from beanie import Document, Indexed
-from pydantic import BaseModel
+from pydantic import BaseModel, model_serializer
 
 
 class Dish(Document):
@@ -11,6 +11,17 @@ class Dish(Document):
 
     class Settings:
         name = "dishes"
+
+    @model_serializer
+    def serialize(self):
+        return {
+            "id": str(self.id),
+            "name": self.name,
+            "price": self.price,
+            "category": self.category,
+            "description": self.description,
+            "quantity": self.quantity
+        }
 
 
 class DishUpdateRequest(BaseModel):
