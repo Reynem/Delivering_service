@@ -1,17 +1,9 @@
 // --- Edit User ---
-// Add event listeners to all edit buttons
 document.querySelectorAll('.edit-user-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
         const userEmail = btn.dataset.userEmail;
         const form = document.getElementById('editUserForm');
 
-        // Fetch user details if not passed via data-* attribute
-        // For simplicity, assuming you might need to fetch full details
-        // Or, if you passed the full user object like in the dish example:
-        // const user = JSON.parse(btn.dataset.user);
-
-        // --- Placeholder: Fetch user data based on userEmail ---
-        // Replace this with actual API call if needed
         console.log(`Workspaceing details for user: ${userEmail}`);
         // Example of manually finding data from the table (less ideal)
         const row = btn.closest('tr');
@@ -30,7 +22,6 @@ document.querySelectorAll('.edit-user-btn').forEach(btn => {
     });
 });
 
-// Handle Edit User Form Submission
 document.getElementById('editUserForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -42,7 +33,6 @@ document.getElementById('editUserForm').addEventListener('submit', async (e) => 
         // Add other fields...
     };
 
-    //  Replace with your actual API endpoint for updating users
     const apiUrl = `/api/admin/users/${userEmail}`; // Example API endpoint structure
 
     try {
@@ -70,7 +60,6 @@ document.getElementById('editUserForm').addEventListener('submit', async (e) => 
 });
 
 // --- Delete User ---
-// Add event listeners to all delete buttons
 document.querySelectorAll('.delete-user-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
         const userEmail = btn.dataset.userEmail;
