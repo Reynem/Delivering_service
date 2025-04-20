@@ -6,7 +6,7 @@ from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.templating import Jinja2Templates
 
 from dishes.database import get_dishes
-from models import Admin
+from models import Admin, User
 from users.encryption import verify_password
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
@@ -20,6 +20,10 @@ async def get_current_admin(request: Request):
     if not admin:
         raise HTTPException(status_code=401, detail="Not authenticated")
     return admin
+
+
+async def get_users(admin: Admin = Depends(get_current_admin)):
+    return await User.find({}).to_list()
 
 
 @router.get("/login", response_class=HTMLResponse)
@@ -55,3 +59,27 @@ async def admin_dashboard(
         "dashboard.html",
         {"request": request, "dishes": serialized_dishes}
     )
+
+
+@router.get("/users", response_class=HTMLResponse)
+async def admin_users(
+        request: Request,
+        admin: Admin = Depends(get_current_admin)
+):
+    users = await get_users()
+    serialized_users = [user.serialize() for user in users]
+    return templates.TemplateResponse(
+        "admin_users.html",
+        {"request": request, "users": serialized_users}
+    )
+
+
+@router.delete("/users/delete/{email}")
+async def admin_delete_user(
+        email: str,
+        request: Request,
+        admin: Admin = Depends(get_current_admin),
+):
+    print(email)
+    await User.find_one(User.email == email).delete()
+    return {"status": 200, "detail": "User is deleted"}

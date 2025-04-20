@@ -1,8 +1,9 @@
 from fastapi.security import HTTPBasicCredentials, HTTPBasic
 from motor.motor_asyncio import AsyncIOMotorClient
 import asyncio
-from models import User, UserCreate, Admin
-from fastapi import HTTPException, Depends
+
+from models import User, UserCreate
+from fastapi import HTTPException
 from users.encryption import hash_password, verify_password
 
 

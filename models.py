@@ -1,5 +1,5 @@
 from beanie import Document
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, model_serializer
 from typing import Optional
 from datetime import datetime, UTC
 
@@ -38,6 +38,17 @@ class User(Document):
 
     class Settings:
         name = "Users"
+
+    @model_serializer
+    def serialize(self):
+        return {
+            "id": str(self.id),
+            "name": self.name,
+            "email": self.email,
+            "phone": self.phone,
+            "address": self.address,
+            "telegram_id": self.telegram_id
+        }
 
 
 class UserCreate(BaseModel):
