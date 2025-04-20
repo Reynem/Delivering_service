@@ -12,13 +12,16 @@ from users.encryption import verify_password
 router = APIRouter(prefix="/admin", tags=["Admin"])
 templates = Jinja2Templates(directory="templates/admin")
 
-admin_oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/admin/login")
-
 
 async def get_current_admin(request: Request):
     admin = request.session.get("admin")
     if not admin:
         raise HTTPException(status_code=401, detail="Not authenticated")
+
+    admin = await Admin.get_admin(admin)
+    if not admin:
+        request.session.pop("admin", None)
+        raise HTTPException(status_code=401, detail="Admin not found or deactivated")
     return admin
 
 
@@ -77,9 +80,11 @@ async def admin_users(
 @router.delete("/users/delete/{email}")
 async def admin_delete_user(
         email: str,
-        request: Request,
         admin: Admin = Depends(get_current_admin),
 ):
     print(email)
-    await User.find_one(User.email == email).delete()
+    try:
+        await User.find_one(User.email == email).delete()
+    except Exception as e:
+        return {"status": 400, "detail": e}
     return {"status": 200, "detail": "User is deleted"}
