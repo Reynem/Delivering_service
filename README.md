@@ -145,3 +145,6 @@ This project is a simple restaurant website built with **FastAPI**, featuring a 
 * Enhance admin analytics dashboard 📊
 * Implement image uploading for dishes 🖼️
 
+## ⚖️ License
+
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
