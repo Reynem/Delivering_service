@@ -137,14 +137,6 @@ This project is a simple restaurant website built with **FastAPI**, featuring a 
 * CORS protection ✅
 * Input validation via Pydantic models
 
-## 📈 Future Improvements
-
-* Add payment gateway integration 💳
-* Implement order history 📜
-* Add dish categories management
-* Enhance admin analytics dashboard 📊
-* Implement image uploading for dishes 🖼️
-
 ## ⚖️ License
 
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
