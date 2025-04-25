@@ -87,7 +87,10 @@ This project is a simple restaurant website built with **FastAPI**, featuring a 
 
 3.  **Run MongoDB:**
 
-    So far, support for the docker has not been added!
+    run docker-compose to start MongoDB. Name of database - dishesDB
+    ```bash
+    docker-compose up -d
+    ```
 
 5.  **Start the application:**
 
