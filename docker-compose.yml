@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  mongo:
+    build:
+      context: ./mongo_init
+      dockerfile: Dockerfile
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo_init/init:/docker-entrypoint-initdb.d
+    container_name: mongo_dishes
+    restart: unless-stopped
