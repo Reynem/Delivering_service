@@ -6,7 +6,6 @@ import dotenv
 from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from users.encryption import verify_password
 from models import User
 
 

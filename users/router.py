@@ -1,9 +1,12 @@
 import datetime
 import uuid
 from fastapi import APIRouter, HTTPException, Body, Depends, Request
+from pydantic import BaseModel
+from random import randint
 from users.database import login_user, register_user
 from models import User, UserCreate, UserUpdate
 from users.auth import create_access_token, get_current_user
+from users.google_auth import verify_google_token, generate_secure_password
 
 
 router = APIRouter()
@@ -60,6 +63,34 @@ async def register_user_api(user: UserCreate):
 
     user = await register_user(user)
     return user
+
+
+class GoogleAuthRequest(BaseModel):
+    id_token: str
+
+
+@router.post("/user/google")
+async def auth_google(data: GoogleAuthRequest):
+    id_info = await verify_google_token(data.id_token)
+    email = id_info.get("email")
+
+    if not email:
+        raise HTTPException(404, "Email not available in Google")
+
+    user = await User.find_one(User.email == email)
+
+    if not user:
+        user = await register_user(UserCreate(
+            email=email,
+            password=generate_secure_password(randint(12, 32))))
+
+        token = create_access_token({"sub": user.email})
+
+        return {
+            "access_token": token,
+            "token_type": "bearer"
+        }
+
 
 
 @router.get("/users/me/")
