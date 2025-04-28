@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
+    const googleSignInBtn = document.getElementById('googleSignInBtn');
 
     if (loginForm) {
         loginForm.addEventListener('submit', handleLogin);
@@ -8,6 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (registerForm) {
         registerForm.addEventListener('submit', handleRegister);
+    }
+
+    if (googleSignInBtn) {
+        googleSignInBtn.addEventListener('click', handleGoogleSignIn);
     }
 });
 
@@ -69,6 +74,44 @@ async function handleRegister(e) {
     } catch (error) {
         showError('Ошибка соединения с сервером');
     }
+}
+
+async function handleGoogleSignIn(e) {
+    e.preventDefault();
+
+    google.accounts.id.initialize({
+        client_id: "388636973029-gktni9q43lprm1m1buf2t03pumelderr.apps.googleusercontent.com",
+        callback: async (response) => {
+            console.log("Google response:", response);
+
+            const id_token = response.credential;
+
+            try {
+                const serverResponse = await fetch('http://localhost:8000/user/google', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id_token: id_token
+                    })
+                });
+
+                const data = await serverResponse.json();
+
+                if (serverResponse.ok) {
+                    localStorage.setItem('token', data.access_token);
+                    window.location.href = '/cabinet';
+                } else {
+                    showError(data.detail || 'Ошибка входа через Google');
+                }
+            } catch (error) {
+                showError('Ошибка соединения с сервером');
+            }
+        }
+    });
+
+    google.accounts.id.prompt();  // Показать всплывающее окно выбора аккаунта
 }
 
 function showError(message) {

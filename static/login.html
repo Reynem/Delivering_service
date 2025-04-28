@@ -6,6 +6,7 @@
     <title>Вход - Gourmet House</title>
     <link rel="stylesheet" href="static/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
     <header class="navbar">
@@ -36,6 +37,7 @@
                     <a href="#forgot-password">Забыли пароль?</a>
                 </div>
             </form>
+            <button id="googleSignInBtn" class="btn-secondary full-width">Войти через Google</button>
             <div id="errorMessage" class="error-message"></div>
         </div>
     </main>
