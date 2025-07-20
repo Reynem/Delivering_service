@@ -7,7 +7,7 @@ class Dish(Document):
     price: Indexed(float)
     category: str
     description: str
-    quantity: Indexed(float)
+    quantity: Indexed(int)
 
     class Settings:
         name = "dishes"
