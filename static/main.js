@@ -69,32 +69,32 @@ async function addToCart(dishName) {
     const button = event.target.closest('.add-to-cart-button');
     if (!button) return;
 
-    const price = parseFloat(button.dataset.price);
-    const category = button.dataset.category;
+    // Эти строки больше не нужны, так как бэкенд сам найдет price и category
+    // const price = parseFloat(button.dataset.price);
+    // const category = button.dataset.category;
 
     try {
         const response = await fetch('/api/cart/add', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` // Если ваша авторизация использует Bearer token
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
-                dish_name: dishName,
-                quantity: 1,
-                price: price,
-                category: category
+                dish_name: dishName, // dish_name все еще нужен для бэкенда, чтобы найти dish_id
+                quantity: 1
+                // price и category удалены из body
             })
         });
 
         if (response.ok) {
             const data = await response.json();
-            if (data.status === "OK") {
-                loadCartItems(); // Обновляем отображение корзины после добавления
-                updateCartDisplay(); // Обновляем счетчик корзины
+            if (data.status === 200) { // Изменил с "OK" на 200, если бэкенд возвращает статус-код
+                loadCartItems();
+                updateCartDisplay();
             } else {
-                console.error('Ошибка при добавлении в корзину:', data.message);
-                alert(data.message || 'Не удалось добавить товар в корзину.');
+                console.error('Ошибка при добавлении в корзину:', data.detail || data.message); // Используем detail или message
+                alert(data.detail || data.message || 'Не удалось добавить товар в корзину.');
             }
         } else {
             const error = await response.json();
@@ -159,47 +159,57 @@ function displayCartItems(cartData) {
     const cartItemsContainer = document.getElementById('cartItems');
     const cartTotalElement = document.getElementById('cartTotal');
     const cartCountElement = document.getElementById('cartCount');
-    if (!cartItemsContainer || !cartTotalElement || !cartCountElement) return;
+
+    // Проверяем наличие всех необходимых элементов DOM
+    if (!cartItemsContainer || !cartTotalElement || !cartCountElement) {
+        console.error('Один или несколько элементов DOM для корзины не найдены.');
+        return;
+    }
 
     cartItemsContainer.innerHTML = ''; // Очищаем предыдущее содержимое
 
-    let totalPrice = 0;
-    let totalQuantity = 0;
+    let totalQuantity = 0; // Теперь totalPrice мы будем брать напрямую из cartData
 
-    if (cartData && cartData.items && Array.isArray(cartData.items)) {
+    if (cartData && cartData.items && Array.isArray(cartData.items) && cartData.items.length > 0) {
         cartData.items.forEach(item => {
             const cartItemDiv = document.createElement('div');
             cartItemDiv.classList.add('cart-item');
+
+            // Убеждаемся, что все нужные поля присутствуют и имеют правильный тип (они должны приходить с бэкенда)
             const itemName = item.dish_name;
-            const itemPrice = item.price !== undefined ? item.price : 'Цена не указана';
-            const itemQuantity = item.quantity !== undefined ? item.quantity : 0;
+            const itemPrice = typeof item.price === 'number' ? item.price : 0; // Ожидаем число
+            const itemQuantity = typeof item.quantity === 'number' ? item.quantity : 0; // Ожидаем число
 
             cartItemDiv.innerHTML = `
                 <div class="cart-item-details">
                     <span class="cart-item-name">${itemName}</span>
-                    <span class="cart-item-price">${itemPrice} ₽</span>
+                    <span class="cart-item-price">${itemPrice.toFixed(2)} ₽</span>
                 </div>
                 <div class="cart-item-quantity">Кол-во: ${itemQuantity}</div>
                 <button class="remove-from-cart-button" data-name="${itemName}">Удалить</button>
             `;
             cartItemsContainer.appendChild(cartItemDiv);
-            totalPrice += (itemPrice || 0) * itemQuantity;
-            totalQuantity += itemQuantity;
+
+            totalQuantity += itemQuantity; // Суммируем количество для счетчика
         });
 
-        const parsedTotalPrice = cartData.total_price !== undefined ? cartData.total_price : 0;
+        // Используем total_price, который пришел с бэкенда, он уже посчитан
+        const parsedTotalPrice = typeof cartData.total_price === 'number' ? cartData.total_price : 0;
         cartTotalElement.textContent = `Итого: ${parsedTotalPrice.toFixed(2)} ₽`;
-        cartCountElement.textContent = totalQuantity;
+
+        cartCountElement.textContent = totalQuantity.toString(); // Обновляем счетчик товаров
 
         // Добавляем обработчики для кнопок "Удалить"
         const removeButtons = cartItemsContainer.querySelectorAll('.remove-from-cart-button');
         removeButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const dishName = this.dataset.name;
+                // Предполагаем, что removeFromCart ожидает dishName
                 removeFromCart(dishName);
             });
         });
     } else {
+        // Если корзина пуста или данные некорректны
         cartItemsContainer.innerHTML = '<p class="cart-empty">Ваша корзина пуста.</p>';
         cartTotalElement.textContent = 'Итого: 0 ₽';
         cartCountElement.textContent = '0';
