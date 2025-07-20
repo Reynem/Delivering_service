@@ -28,19 +28,20 @@ async def show_cart(user_email: EmailStr):
         print(e)
 
 
-async def cart_delete(user_email: EmailStr, dish_name: str, quantity: float):
+async def cart_delete(user_email: EmailStr, dish_name: str, quantity: int):
     try:
-        client_cart = await Cart.find(Cart.user_email == user_email, Cart.dish_name == dish_name).to_list()
-        if not client_cart:
+        client_item = await Cart.find_one(Cart.user_email == user_email, Cart.dish_name == dish_name)
+
+        if not client_item:
             raise HTTPException(400, "No such item in cart")
 
-        for _ in range(int(quantity)):
-            item_client = client_cart.pop()
-            if item_client.quantity - 1 > 0:
-                item_client.quantity -= 1
-                await item_client.save_changes()
-            else:
-                await item_client.delete()
+        upd_quantity = client_item.quantity - quantity
+
+        if upd_quantity > 0:
+            client_item.quantity = upd_quantity
+            await client_item.save_changes()
+        else:
+            await client_item.delete()
     except Exception as e:
         raise HTTPException(404, str(e))
 
@@ -58,7 +59,7 @@ async def cart_clear(user_email: EmailStr):
         raise HTTPException(400, str(e))
 
 
-async def cart_update(user_email: EmailStr, dish_name, quantity: float):
+async def cart_update(user_email: EmailStr, dish_name, quantity: int):
     try:
         client_cart = await Cart.find_one(Cart.user_email == user_email, Cart.dish_name == dish_name)
         if not client_cart:

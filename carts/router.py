@@ -87,7 +87,7 @@ async def clear_cart_items_api(user=Depends(get_current_user)):
 @router.delete('/api/cart/remove/{dish_name}/', status_code=200)
 async def remove_cart_item_api(
         dish_name: str,
-        quantity: float = Query(1.0, gt=0, description="Quantity to remove"),
+        quantity: int = Query(1.0, gt=0, description="Quantity to remove"),
         user=Depends(get_current_user)
 ):
     await cart_delete(user.email, dish_name, quantity)
@@ -97,7 +97,7 @@ async def remove_cart_item_api(
 @router.put('/api/cart/update/{dish_name}/', status_code=200)
 async def update_cart_item_api(
         dish_name: str,
-        quantity: float = Query(1.0, description="Quantity to update(negatives are allowed)"),
+        quantity: int = Query(1.0, description="Quantity to update(negatives are allowed)"),
         user=Depends(get_current_user)
 ):
     await cart_update(user.email, dish_name, quantity)

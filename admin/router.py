@@ -1,6 +1,5 @@
 
 from fastapi import APIRouter, HTTPException, Form, Depends
-from fastapi.security import OAuth2PasswordBearer
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.templating import Jinja2Templates

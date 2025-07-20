@@ -1,6 +1,5 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 import asyncio
-from beanie import init_beanie
 from dishes.models import Dish
 
 

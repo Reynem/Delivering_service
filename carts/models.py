@@ -1,13 +1,11 @@
-from beanie import Document, Indexed
+from beanie import Document, Indexed, PydanticObjectId
 from pydantic import EmailStr, BaseModel
 
 
 class Cart(Document):
     user_email: EmailStr
-    dish_name: str
-    price: Indexed(float)
-    category: str
-    quantity: Indexed(float)
+    dish_id: PydanticObjectId
+    quantity: Indexed(int)
 
     class Settings:
         name = "carts"
@@ -18,4 +16,4 @@ class CartIn(BaseModel):
     dish_name: str
     price: float
     category: str
-    quantity: float
+    quantity: int
