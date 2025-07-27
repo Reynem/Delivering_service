@@ -1,5 +1,5 @@
 fastapi~=0.115.11
-starlette~=0.46.1
+starlette>=0.47.2
 beanie~=1.29.0
 pydantic~=2.10.6
 httpx~=0.28.1
